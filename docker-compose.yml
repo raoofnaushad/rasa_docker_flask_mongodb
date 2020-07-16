@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+    webapp:   
+        build:  
+            context: .
+            dockerfile: Dockerfile
+        container_name: webapp
+        restart: unless-stopped
+        environment: 
+            APP_DEBUG: "True"
+            APP_PORT: 5056
+            MONGODB_DATABASE: flaskdb
+            MONGODB_USERNAME: mongodbuser
+            MONGODB_PASSWORD: password
+            MONGODB_HOSTNAME: mongodb      
+        networks: 
+            - backend
+        ports:
+            - "5056:5056"
+            - "5055:5055"
+        depends_on:
+            - mongodb
+        volumes:
+            - .:/home/accubits/ivr/
+        
+    mongodb:
+        image: mongo:4.0.8
+        container_name: mongodb
+        restart: unless-stopped
+        command: mongod --auth
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: mongodbuser
+            MONGO_INITDB_ROOT_PASSWORD: password
+            MONGO_INITDB_DATABASE: flaskdb
+            MONGODB_DATA_DIR: /data/db
+            MONDODB_LOG_DIR: /dev/null
+        volumes:
+            - mongodbdata:/data/db
+        networks:
+            - backend
+
+networks:
+    backend:
+        driver: bridge
+
+volumes:
+    mongodbdata:
+        driver: local

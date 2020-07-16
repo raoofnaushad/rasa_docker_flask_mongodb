@@ -1,0 +1,4 @@
+flask 
+rasa 
+Flask-PyMongo 
+requests
